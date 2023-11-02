@@ -5,6 +5,12 @@ import express from 'express';
 const host = "localhost";
 const port = 8080;
 const app = express();
+app.use(express.json()); //ngehandle js nya
+app.get("/users", UserService.getUser);
+app.post("/users", UserService.createUser);
+app.put("/users/:id", UserService.updateUser);
+app.delete("/users/:id", UserService.deleteUser);
+app.post("/login", UserService.login);
 
 app.listen(port, host, () => {
     console.log(`server berjalan di http://${host}:${port}`);
@@ -36,11 +42,23 @@ app.listen(port, host, () => {
 // await UserService.updateUser(2, "wid", "widya@test.com");
 
 // await UserService.deleteUser(5);
-await UserService.getUser();
+// await UserService.getUser();
 
 // await TaskService.createTask(2, "Buat PR", "PR Matematika dan IPA", false);
 // await TaskService.getTask();
 // await TaskService.getTaskById(1);
 // await TaskService.updateTask(1, "Kerjain PR Bro", "Matem sama IPAS", true);
 // await TaskService.deleteTask(1);
-await TaskService.getTask();
+// await TaskService.getTask();
+
+/*
+1. buat api delete user
+2. Modifikasi API create, update user
+ - respon data user detail yang di create/update
+3. buat api login
+ - path yang dibuat /login
+ - method post
+ - request body yang diberikan email dan pass
+ - jika cocok email dan pass maka berikan respon data user tsb
+ - bila tidak cocok maka berikan response dengan message "email atau password salah"
+*/
