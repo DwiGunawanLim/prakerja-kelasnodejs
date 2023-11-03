@@ -5,12 +5,22 @@ import express from 'express';
 const host = "localhost";
 const port = 8080;
 const app = express();
+
 app.use(express.json()); //ngehandle js nya
+
+// Handle Routing User
 app.get("/users", UserService.getUser);
+app.get("/users/detail", UserService.getUserById);
 app.post("/users", UserService.createUser);
 app.put("/users/:id", UserService.updateUser);
 app.delete("/users/:id", UserService.deleteUser);
 app.post("/login", UserService.login);
+
+// Handle Routing Task
+app.get("/tasks", TaskService.getTask);
+app.post("/tasks", TaskService.createTask);
+app.put("/tasks/:id", TaskService.updateTask);
+app.delete("/tasks/:id", TaskService.deleteTask);
 
 app.listen(port, host, () => {
     console.log(`server berjalan di http://${host}:${port}`);

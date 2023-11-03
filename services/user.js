@@ -41,10 +41,10 @@ export const getUserById = async(request, response, next) => {
         const [result] = await getDataById(id);
 
         if (result.length > 0) {
-            successResponse(response, "Update Berhasil Dilakukan", result[0]);
+            successResponse(response, `User dengan ID ${id} Ditemukan`, result[0]);
             // console.log(result[0]);
         } else {
-            errorResponse(response, "User ID Not Found!");
+            errorResponse(response, `User ID:${id}  Not Found!`);
             // console.log(`Data User Tidak Ditemukan`);
         }
     } catch (error) {
