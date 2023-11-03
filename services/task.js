@@ -3,7 +3,7 @@ import { getTaskData, createTaskData, getTaskDataById, updateTaskData, deleteTas
 import { errorResponse, successResponse } from "../utils/response.js";
 
 export const createTask = async(request, response, next) => {
-    let userId = request.body.user_id;
+    let userId = request.claims.id;
     let taskName = request.body.task_name;
     let taskDesc = request.body.task_description;
     let isDone = request.body.is_done;
@@ -98,4 +98,3 @@ export const deleteTask = async(request, response, next) => {
     }
 
 }
-

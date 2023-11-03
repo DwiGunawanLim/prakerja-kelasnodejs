@@ -9,19 +9,19 @@ const app = express();
 app.use(express.json()); //ngehandle js nya
 
 // Handle Routing User
-app.get("/users", UserService.getUser);
-app.get("/users/detail", UserService.getUserById);
-app.post("/users", UserService.createUser);
-app.put("/users/:id", UserService.updateUser);
-app.delete("/users/:id", UserService.deleteUser);
+app.get("/users", UserService.validateToken, UserService.getUser);
+app.get("/users/detail", UserService.validateToken, UserService.getUserById);
+app.post("/users", UserService.validateToken, UserService.createUser);
+app.put("/users/:id", UserService.validateToken, UserService.updateUser);
+app.delete("/users/:id", UserService.validateToken, UserService.deleteUser);
 app.post("/login", UserService.login);
 
 // Handle Routing Task
-app.get("/tasks", TaskService.getTask);
-app.get("/tasks/detail", TaskService.getTaskById);
-app.post("/tasks", TaskService.createTask);
-app.put("/tasks/:id", TaskService.updateTask);
-app.delete("/tasks/:id", TaskService.deleteTask);
+app.get("/tasks", UserService.validateToken, TaskService.getTask);
+app.get("/tasks/detail", UserService.validateToken, TaskService.getTaskById);
+app.post("/tasks", UserService.validateToken, TaskService.createTask);
+app.put("/tasks/:id", UserService.validateToken, TaskService.updateTask);
+app.delete("/tasks/:id", UserService.validateToken, TaskService.deleteTask);
 
 app.listen(port, host, () => {
     console.log(`server berjalan di http://${host}:${port}`);
@@ -72,4 +72,9 @@ app.listen(port, host, () => {
  - request body yang diberikan email dan pass
  - jika cocok email dan pass maka berikan respon data user tsb
  - bila tidak cocok maka berikan response dengan message "email atau password salah"
+*/
+
+/*
+1. Tambahkan masing2 endpoint yang sudah di buat dengan validasi token
+2. Untuk endpoint create task, ambil value untuk user_id, dari payload token.
 */

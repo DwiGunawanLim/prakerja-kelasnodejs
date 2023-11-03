@@ -33,4 +33,10 @@ const deleteData = (id) => {
     return dbPool.query(query, [id]);
 }
 
-export {createData, getData, getDataById, updateData, deleteData} 
+const getDataByEmail = (email) => {
+    const query = "SELECT user_id, name, email, password, created_at FROM users WHERE email=?";
+
+    return dbPool.query(query, [email]);
+}
+
+export {createData, getData, getDataById, getDataByEmail, updateData, deleteData} 

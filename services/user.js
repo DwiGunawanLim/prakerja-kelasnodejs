@@ -1,22 +1,31 @@
 import { request, response } from "express";
-import { getData, createData, getDataById, updateData, deleteData } from "../repositories/users.js";
+import { getData, createData, getDataById, updateData, deleteData, getDataByEmail } from "../repositories/users.js";
 import { errorResponse, successResponse } from "../utils/response.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+const SECRET_ACCESS_TOKEN = "kelas.com";
+const SECRET_REFRESH_TOKEN = "backend";
 
 export const createUser = async (request, response, next) => {
     let nama = request.body.name;
     let email = request.body.email;
     let password = request.body.password;
+    let saltRound = 10;
 
-    const [result] = await createData(nama, email, password);
-    const [detailUser] = await getDataById(result.insertId);
+    bcrypt.hash(password, saltRound, async(err, hashedPassword) => {
+        const [result] = await createData(nama, email, hashedPassword);
+        const [detailUser] = await getDataById(result.insertId);
 
-    if (result.insertId > 0) {
-        successResponse(response, "Success", detailUser[0]);
-        // console.log(`Data User Berhasil Dibuat Dengan ID: ${result.insertId}`);
-    } else {
-        errorResponse(response, "Failed Create Data")
-        // console.log(`Data Gagal Dibuat.`);
-    }
+        if (result.insertId > 0) {
+            successResponse(response, "Success", detailUser[0]);
+            // console.log(`Data User Berhasil Dibuat Dengan ID: ${result.insertId}`);
+        } else {
+            errorResponse(response, err);
+            // errorResponse(response, "Failed Create Data")
+            // console.log(`Data Gagal Dibuat.`);
+        }
+    });
 }
 
 export const getUser = async (request, response, next) => {
@@ -97,16 +106,57 @@ export const login = async(request, response, next) => {
         let email = request.body.email;
         let password = request.body.password;
 
-        const [result] = await getData();
+        // const [result] = await getData();
+        const [result] = await getDataByEmail(email);
 
-        for (let i = 0; i < result.length; i++) {
-            if (result[i].email == email && result[i].password == password) {
-                const element = result[i];
-                successResponse(response, "Login Berhasil", element);
-            }
+        if (result.length > 0) {
+            let user = result[0];
+            bcrypt.compare(password, user.password, (err, isValid) => {
+                if (isValid) {
+                    let payload = {
+                        id: user.user_id,
+                        name: user.name,
+                        email: user.email
+                    };
+                    let accessToken = jwt.sign(payload, SECRET_ACCESS_TOKEN, {expiresIn: '15m'});
+                    let refreshToken = jwt.sign(payload, SECRET_REFRESH_TOKEN, {expiresIn: '30m'});
+                    let data = {
+                        access_token: accessToken,
+                        refresh_token: refreshToken
+                    }
+                    successResponse(response, "Login Berhasil", data);
+                } else {
+                    errorResponse(response, "Email atau Password Salah!", 401);
+                }
+            })
         }
+
+        // for (let i = 0; i < result.length; i++) {
+        //     if (result[i].email == email && result[i].password == password) {
+        //         const element = result[i];
+        //         successResponse(response, "Login Berhasil", element);
+        //     }
+        // }
     } catch (error) {
         next(error);
     }
 }
 
+export const validateToken = (request, response, next) => {
+    try {
+        let authToken = request.headers.authorization;
+        let accessToken = authToken && authToken.split(' ')[1]; 
+        
+        jwt.verify(accessToken, SECRET_ACCESS_TOKEN, (error, payload) => {
+            if (!error) {
+                request.claims = payload;
+                next();
+            } else {
+                errorResponse(response, error.message, 403);
+            }
+        })
+
+    } catch (error) {
+        next(error);
+    }
+}
