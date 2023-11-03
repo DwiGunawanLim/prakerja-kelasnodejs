@@ -1,25 +1,22 @@
+import { request, response } from "express";
 import { getTaskData, createTaskData, getTaskDataById, updateTaskData, deleteTaskData } from "../repositories/tasks.js";
 import { errorResponse, successResponse } from "../utils/response.js";
 
-export const createTask = async (request, response, next) => {
-    try {
-        let userId = request.body.user_id;
-        let taskName = request.body.task_name;
-        let taskDesc = request.body.task_description;
-        let isDone = request.body.is_done;
+export const createTask = async(request, response, next) => {
+    let userId = request.body.user_id;
+    let taskName = request.body.task_name;
+    let taskDesc = request.body.task_description;
+    let isDone = request.body.is_done;
 
-        const [result] = await createTaskData(userId, taskName, taskDesc, isDone);
-        const [detailTask] = await getTaskById(result.insertId);
+    const [result] = await createTaskData(userId, taskName, taskDesc, isDone);
+    const [detailTask] = await getTaskDataById(result.insertId);
 
-        if (result.insertId > 0) {
-            successResponse(response, "Berhasil Menambahkan Tugas", detailTask[0]);
-            // console.log(`Data Tugas Berhasil Dibuat Dengan ID: ${result.insertId}`);
-        } else {
-            errorResponse(response, "Gagal Menambahkan Tugas");
-            // console.log(`Data Tugas Gagal Dibuat.`);
-        }
-    } catch (error) {
-        next(error);
+    if (result.insertId > 0) {
+        successResponse(response, "Berhasil Menambahkan Tugas", detailTask[0]);
+        // console.log(`Data Tugas Berhasil Dibuat Dengan ID: ${result.insertId}`);
+    } else {
+        errorResponse(response, "Gagal Menambahkan Tugas");
+        // console.log(`Data Tugas Gagal Dibuat.`);
     }
     
 }
@@ -68,7 +65,7 @@ export const updateTask = async(request, response, next) => {
         let isDone = request.body.is_done;
 
         const [result] = await updateTaskData(taskId, taskName, taskDesc, isDone);
-        const [detailTask] = await getTaskById(taskId);
+        const [detailTask] = await getTaskDataById(taskId);
     
         if (result.affectedRows > 0) {
             successResponse(response, "Update Tugas Berhasil Dilakukan", detailTask[0]);

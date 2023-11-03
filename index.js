@@ -18,6 +18,7 @@ app.post("/login", UserService.login);
 
 // Handle Routing Task
 app.get("/tasks", TaskService.getTask);
+app.get("/tasks/detail", TaskService.getTaskById);
 app.post("/tasks", TaskService.createTask);
 app.put("/tasks/:id", TaskService.updateTask);
 app.delete("/tasks/:id", TaskService.deleteTask);
